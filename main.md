@@ -16,7 +16,7 @@ marp: true
 ---
 # Top-down aka Recursive Descent Parsing
 ![w:700](https://ruslanspivak.com/lsbasi-part7/lsbasi_part7_parsetree_01.png)
-
+## A language of arithmetic expressions
 
 ---
 # Top-Down aka Recursive Descent Parsing
@@ -44,7 +44,11 @@ marp: true
 
 ---
 # Bottom Up parsing ( $LR(k)$ )
-- We saw this in Hopcroft 7.4: the Cocke, Younger & Kasami algorithm
+- [We saw this in Hopcroft 7.4: the Cocke, Younger & Kasami algorithm](https://en.wikipedia.org/wiki/CYK_algorithm#/media/File:CYK_algorithm_animation_showing_every_step_of_a_sentence_parsing.gif)
+![w:900](https://i.ytimg.com/vi/rrlaVty0_iQ/maxresdefault.jpg)
+
+---
+# LR(k) parsing
 - The parser scans the entire input string in one forward pass
 - The stack begins empty and Non-terminals are added that correspond to the current input
 - Unlike in top-down (LL) parsing, decisions are made not just based on the stack-top/input pair, but on the **entire** stack and the input
@@ -55,11 +59,30 @@ marp: true
 ## If CYK is $O(n^3)$ why do people write Top Down Parsers?
 
 ---
-# Why are GCC, Clang, Javac etc all LL parsers?
-Show some examples of the parsers here
-- Almost all modern compiler infrastructures for popular industrial languages use LL parsing?
-- This seems to fly in the face of what we have learned about computational complexity
-- TLDR: It's because if you want to write a bottom up LR parser, it's too god damned hard to write it by hand
+# The plot so far:
+- LR parsers always do their work in polynomial time.
+- LL parsers are at best NP and at worst Exponential.
+## So why do almost all modern compiler infrastructures for popular industrial languages use LL parsing?
+- GCC (G++), Clang, Go, Javac, etc...
+- GCC actually used to use a LR parser but [switched](https://gcc.gnu.org/wiki/New_C_Parser)
+## This seems to fly in the face of what we have learned about computational complexity
+
+---
+# TLDR:  It's because if you want to write a bottom up LR parser, it's too god damned hard to write it by hand
+
+- [Recursive Descent C Compiler](https://github.com/gcc-mirror/gcc/blob/ad9db543abb523cd97f1aa5af78a72188c01aa6e/gcc/c/c-parser.c#L2615-L2900)
+
+### It's not that complicated, basically what you wrote in your PL class
+- you know:
+```
+while(true) { 
+    switch(input) { 
+        case 'a': do_stuff(); ... 
+    }
+}
+```
+- [Compare that to a $LR(3)$ C compiler](https://github.com/gcc-mirror/gcc/blob/a02b08955f97eacca8261c2d57b08c7f5d287cc6/gcc/c-parse.c#L143-L3944)
+
 
 ---
 # First some background on LR parsers
@@ -69,9 +92,6 @@ Show some examples of the parsers here
 ---
 # Some examples of LR parser generator tools
 Yacc, Bison, PLY, PGen, Lark, etc
-- You literally would not ever see something like your lexer/parser that you wrote in your programming languages class in real life compilers
-- you know:
-`while(true) { switch(input) { case 'a': do_stuff(); ... }}`
 
 ---
 # You feed it a EBNF or PEG grammar and it gives you the world
@@ -118,3 +138,7 @@ It's all kind of a moot point because...
 - Not giant C++ programs that get distributed as binaries
 - You get a fast computer, compile it and forget about it
 - Who cares if it's $O(K^N)$?
+
+---
+# References
+- [LL and LR in Context Blog Post](http://blog.reverberate.org/2013/09/ll-and-lr-in-context-why-parsing-tools.html)
