@@ -1,10 +1,8 @@
 ---
 marp: true
 ---
-# LL (top-down) vs. LR (bottom-up) Parsers:
-
+# LL(k) (top-down) vs. LR(k) (bottom-up) Parsers:
 ### What, when and why one should care.
-
 ## Oren Friedman
 
 ---
@@ -16,13 +14,44 @@ marp: true
 - but it's kind of interesting to understand when and why you might and why things are the way they are
 
 ---
-# Overview of Top Down Parsing
-## Worst case complexity $O(k^n)$
-Exponential growth
+# Top-down aka Recursive Descent Parsing
+![w:700](https://ruslanspivak.com/lsbasi-part7/lsbasi_part7_parsetree_01.png)
+
 
 ---
-# Overview of Bottom Up parsing
-Polynomial growth in the worst case
+# Top-Down aka Recursive Descent Parsing
+- you don't have to think hard to see how it works
+- mimics generating a context free string
+- take a start symbol, try productions down the parse tree until they termintate
+- Given a string of non-terminals, take the leftmost and apply the production
+- match your parse tree leaves with the input string
+- if it doesn't match, rewind the subtree and try a different derivation
+- Left-recursive grammars can't be handled
+- Worst case complexity $O(k^n)$
+
+---
+# Top-Down parsing with look-ahead
+- Naive backtracking recursive descent is potentially so expensive
+- $LL(k)$ parsers use $k$-symbol look-ahead to remove ambiguity
+1. The stack-top `T` is the start symbol and $0<i = k$
+2. `Input` is the next $k-i+1$ text symbols
+  - If `T == Input`, pop the stack top and eat the input
+3. Otherwise look up `(T, Input)` pair in a rule table
+  - If a rule exists such that `(T, Input) -> P`, stack top `T = P` and `i = k`
+  - Otherwise, `i = i-1; GOTO 2`
+### Still possible to have exponential complexity with blow-up in look up table size (think about an adversarially designed input string)
+[Reference](https://en.wikipedia.org/wiki/LL_parser#Concrete_example)
+
+---
+# Bottom Up parsing ( $LR(k)$ )
+- We saw this in Hopcroft 7.4: the Cocke, Younger & Kasami algorithm
+- The parser scans the entire input string in one forward pass
+- The stack begins empty and Non-terminals are added that correspond to the current input
+- Unlike in top-down (LL) parsing, decisions are made not just based on the stack-top/input pair, but on the **entire** stack and the input
+- At each step, the stack symbols are reduced down to keep the stack size small
+- This process is known as "shift-reduce" and it is essentially what CYK does
+- Lookahead of up to $k$ symbols is also used to handle grammatical ambiguity
+- [Reference](https://en.wikipedia.org/wiki/LR_parser#LR_parse_steps_for_example_A*2_+_1)
 ## If CYK is $O(n^3)$ why do people write Top Down Parsers?
 
 ---
