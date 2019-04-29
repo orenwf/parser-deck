@@ -68,12 +68,11 @@ marp: true
 ## This seems to fly in the face of what we have learned about computational complexity
 
 ---
-# TLDR:  It's because if you want to write a bottom up LR parser, it's too god damned hard to write it by hand
+# TLDR:  It's because if you want to write a bottom up LR parser, it's too hard to write it by hand
 
-- [Recursive Descent C Compiler](https://github.com/gcc-mirror/gcc/blob/ad9db543abb523cd97f1aa5af78a72188c01aa6e/gcc/c/c-parser.c#L2615-L2900)
+## [Recursive Descent C Parser](https://github.com/gcc-mirror/gcc/blob/ad9db543abb523cd97f1aa5af78a72188c01aa6e/gcc/c/c-parser.c#L2615-L2900)
 
-### It's not that complicated, basically what you wrote in your PL class
-- you know:
+### It's not that complicated, basically what you wrote in your PL class:
 ```
 while(true) { 
     switch(input) { 
@@ -81,28 +80,40 @@ while(true) {
     }
 }
 ```
-- [Compare that to a $LR(3)$ C compiler](https://github.com/gcc-mirror/gcc/blob/a02b08955f97eacca8261c2d57b08c7f5d287cc6/gcc/c-parse.c#L143-L3944)
-
 
 ---
-# First some background on LR parsers
-- Why we need parser generators for practical LR parsers
-- Overview of how they work
+# Why do we need parser generators for practical $LR$ parsers?
+- Because essentially, they do the reverse of $LL$ parsers:
+  - While $LL$ parsers just rely on the top stack symbol and an input to transition
+  - $LR$ parsers have to calculate transitions from the whole stack plus an input
+  - An $LR(1)$ parser generator takes a grammar and builds huge tables
+    - essentially these define the transitions for all possible stack states
+## [Now, compare that $LL$ parser from before to a $LR(3)$ C compiler](https://github.com/gcc-mirror/gcc/blob/a02b08955f97eacca8261c2d57b08c7f5d287cc6/gcc/c-parse.c#L143-L3944)
 
 ---
 # Some examples of LR parser generator tools
-Yacc, Bison, PLY, PGen, Lark, etc
-
+- [**Yacc**: developed for Unix at Bell, based on Knuth's seminal work on LR parsing](http://bxr.su/OpenBSD/usr.bin/yacc/)
+- [**Bison**: developed for GNU/Linux by the Free Software Foundation](https://en.wikipedia.org/wiki/GNU_Bison)
+- [SLY: written in Python, tries to improve LR parsing UX](https://sly.readthedocs.io/en/latest/)
+- PGen
+- Lark, and so, so many others...
+## It's almost a rite of passage for compiler students...
+- They all work in a similar way, with slightly different algorithms
+- Their goal is to build the parsing tables for all possible stack configurations
 ---
 # You feed it a EBNF or PEG grammar and it gives you the world
-- These tools are amazeballs, but they have their limitations
-- Hard to get good error messages
+- There are industry standard formats for grammars (like Greibach, etc.)
+- If you look at [Python](https://github.com/python/cpython/tree/master/Parser) and try to find a parser, you wont, you'll see PGen and C files
+## These tools are amazeballs, but they have their limitations:
+- Hard to debug generated code
+- get good error messages
 - Hard to reason about intuitively to do hand optimization which is sometimes the only way
 
 ---
-# Therefore, we end up with LL parsing tools written by hand
+# Drawbacks of LR stem from the Automated Tooling
+- Since the tables are all created by an automated process it's difficult for the developer to insert rich human readable debugging information without dealing with and adding a large amount of complexity to an already complex tool
+## Therefore, we end up with LL parsing tools written by hand
 - Top down parsing is easier to reason about
-- That's good, if you're writing it by hand
 - Writing it by hand lets you hand-roll optimizations
 - Let's you really get down and dirty with edge cases
   - optimizations
@@ -110,11 +121,19 @@ Yacc, Bison, PLY, PGen, Lark, etc
 
 ---
 # There also exist some LL parser generator tools
-Antlr
+## [Antlr](https://www.antlr.org/about.html)
+- Antlr is extremely cool, in many ways it combines the best of both worlds by automatically generating a performant, correct and human readable parser with good error messaging
+
+# There are even modern LR generators that do the same thing as ANTLR
+
+## [Lark](https://github.com/lark-parser/lark) automatically creates human readable debugging info
 
 ---
-# Mind Blown? There are also LR parser generator tools that fix the old problems
-It's all kind of a moot point because...
+- So, I just talked for like 20 minutes about the differences between LL/LR
+- And in terms of performance, in the big picture of a compiler infrastructure
+# Parsing time doesn't matter much for languages you care about
+- C, C++, Java: you develop your code, compile it a few hundred times, maybe
+- Then just distribute the executables
 
 ---
 # SEMANTIC ANALYSIS IS HARD
