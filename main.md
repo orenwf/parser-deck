@@ -1,7 +1,7 @@
 ---
 marp: true
 ---
-# LL(k) (top-down) vs. LR(k) (bottom-up) Parsers:
+# $LL$ vs. $LR(k)$ parsers:
 ### What, when and why one should care.
 ## Oren Friedman
 
@@ -103,8 +103,9 @@ while(true) {
 ---
 # You feed it a EBNF or PEG grammar and it gives you the world
 - There are industry standard formats for grammars (like Greibach, etc.)
-- If you look at [Python](https://github.com/python/cpython/tree/master/Parser) and try to find a parser, you wont, you'll see PGen and C files
-## These tools are amazeballs, but they have their limitations:
+- If you look at [CPython](https://github.com/python/cpython/tree/master/Parser) and try to find a Python parser, you wont
+  - you'll see PGen and C files
+### These tools are amazeballs, but they have their limitations:
 - Hard to debug generated code
 - get good error messages
 - Hard to reason about intuitively to do hand optimization which is sometimes the only way
@@ -129,22 +130,85 @@ while(true) {
 ## [Lark](https://github.com/lark-parser/lark) automatically creates human readable debugging info
 
 ---
+# So...     ¯\\\_(ツ)_/¯   ...?
 - So, I just talked for like 20 minutes about the differences between LL/LR
-- And in terms of performance, in the big picture of a compiler infrastructure
-# Parsing time doesn't matter much for languages you care about
+- And in terms of performance, in the big picture of a compiler infrastructure:
+## Parsing doesn't matter much for languages you care about
 - C, C++, Java: you develop your code, compile it a few hundred times, maybe
 - Then just distribute the executables
 
 ---
+# Also, C, C++, Java, (insert your favorite language):
+# :open_mouth: ARE NOT CONTEXT FREE :open_mouth:
+- most of their syntax is... but there are major ambiguities which require machinery going beyond a stack machine to deal with.
+
+```
+x * y;
+```
+
+- Valid C/C++: what does it do?
+
+---
+# Nope
+
+```
+...
+
+typedef int x;
+
+...
+
+x * y;
+
+...
+```
+Hooray, it's a variable declaration!
+
+## We need things like awareness of symbols and variables
+- This requires something that goes beyond context free languages
+
+---
+# In fact...
+![w:900](stOlZSXIs4cskkFkbkfU3Pw.png)
+
+---
+# LL and LR parsers are really restricted
+## A naive / pure implementation of what we learned only parses a subset of Context Free Languages
+- in order to do anything real (aka handle grammar ambiguities) you need to do more work
+- our nice happy context free parsing algorithm in deterministic $O(n^3)$ time can't handle real programming languages
+
+---
 # SEMANTIC ANALYSIS IS HARD
-- typically also exponential in the size of the input?
-- or at least probabilistically polynomial with a very high K while LL parsing can really be NP polynomial
+- maybe even exponential in the size of the input
+- or at least NP with a very large constant factor
 - Semantic analysis is extremely important for your typical C style programming language
   - building your attribute grammar
   - checking type correctness
   - memory safety checking by the compiler (Rust)
   - garbage collection algorithms
 ## Who really gives a damn whether the parser is $O(n^3)$?
+
+---
+# Starting to see the bigger picture...
+### Compiler infrastructures are such complex pieces of software, it helps to have a parser designed in a way that can be reasoned about:
+- debugging
+- optimization
+- enhanced with rich user feedback
+### Top down parsing may be slower than bottom up, but not by much
+### Other work that "real" compilers do is slower than $O(n^k)$
+
+---
+# Where might deterministic parsing time matter?
+[Interpreted languages where the parsing is much of the work or run repeatedly on interpreters without compilation to machine language](https://en.wikipedia.org/wiki/GNU_Bison#Use)
+  - Ruby, Python, PHP, JavaScript (this is complicated)
+  - Bash
+  - *SQL engines
+  - JSON & HTML parsers
+  - GPL Languages that are very regular or context free:
+    - Lisps!
+
+### Implementations of these use $LR(k)$ parsers
+Deterministic $O(n^k)$ buys you more here because you parse a ton of this stuff.
 
 ---
 # So where does LL vs. LR parsing really matter?
@@ -159,5 +223,19 @@ while(true) {
 - Who cares if it's $O(K^N)$?
 
 ---
+# Thanks
+### orenwf@gmail.com
+
+---
 # References
+- [Aho, Sethi, Ullman: Compilers]()
+- [Cooper, Torczon: Engineering a Compiler]()
 - [LL and LR in Context Blog Post](http://blog.reverberate.org/2013/09/ll-and-lr-in-context-why-parsing-tools.html)
+- [Parser Generator Wiki](https://en.wikipedia.org/wiki/Comparison_of_parser_generators)
+- [StackOverflow: Terence Parr](https://stackoverflow.com/questions/4092280/what-advantages-do-ll-parsers-have-over-lr-parsers?rq=1)
+- [StackOverflow: Ira Baxter](https://stackoverflow.com/questions/6319086/are-gcc-and-clang-parsers-really-handwritten)
+- [WikiPedia: LL Parsing](https://en.wikipedia.org/wiki/LL_parser)
+- [WikiPedia: Top-Down Parsing](https://en.wikipedia.org/wiki/Top-down_parsing)
+- [ANTLR: $LL(k)$ Parser Generator](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.57.881&rep=rep1&type=pdf)
+- [WikiPedia: $LR(k)$ Parsing](https://en.wikipedia.org/wiki/LR_parser)
+- [Josh Haberman Blog](http://blog.reverberate.org/2013/07/ll-and-lr-parsing-demystified.html)
