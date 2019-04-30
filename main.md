@@ -228,8 +228,8 @@ Deterministic $O(n^k)$ buys you more here because you parse a ton of this stuff.
 
 ---
 # References
-- [Aho, Sethi, Ullman: Compilers]()
-- [Cooper, Torczon: Engineering a Compiler]()
+- [Aho, Sethi, Ullman: Compilers](https://www.pearson.com/us/higher-education/program/Aho-Compilers-Principles-Techniques-and-Tools-2nd-Edition/PGM167067.html)
+- [Cooper, Torczon: Engineering a Compiler](https://www.elsevier.com/books/engineering-a-compiler/cooper/978-0-12-088478-0)
 - [LL and LR in Context Blog Post](http://blog.reverberate.org/2013/09/ll-and-lr-in-context-why-parsing-tools.html)
 - [Parser Generator Wiki](https://en.wikipedia.org/wiki/Comparison_of_parser_generators)
 - [StackOverflow: Terence Parr](https://stackoverflow.com/questions/4092280/what-advantages-do-ll-parsers-have-over-lr-parsers?rq=1)
